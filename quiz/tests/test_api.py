@@ -197,6 +197,9 @@ class ExternalHttpTests(LiveServerTestCase):
         self.assertEqual(self.request("GET", question_url).status_code, 404)
 
 class ContractTests(APITestCase):
+    def test_swagger_docs_page_renders(self):
+        self.assertEqual(self.client.get("/api/docs/").status_code, 200)
+
     def test_every_operation_the_gateway_offers_exists_in_the_contract(self):
         """If the API changes and the allowlist does not, this fails: the contract is the source of truth."""
         seed()
@@ -212,3 +215,4 @@ class ContractTests(APITestCase):
     def test_the_contract_declares_token_authentication(self):
         schema = self.client.get("/api/schema/", {"format": "json"}).json()
         self.assertIn("tokenAuth", schema["components"]["securitySchemes"])
+
