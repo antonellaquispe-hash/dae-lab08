@@ -2,8 +2,8 @@ from django.db.models import Count
 from drf_spectacular.utils import OpenApiParameter, extend_schema, extend_schema_view
 from rest_framework import filters, viewsets
 
-from .models import Exam, Question
-from .serializers import ExamSerializer, QuestionSerializer
+from .models import Choice, Exam, Question
+from .serializers import ChoiceResourceSerializer, ExamSerializer, QuestionSerializer
 
 
 class ExamViewSet(viewsets.ModelViewSet):
@@ -29,3 +29,13 @@ class QuestionViewSet(viewsets.ModelViewSet):
         if exam and exam.isdigit():
             queryset = queryset.filter(exam_id=int(exam))
         return queryset
+
+
+class ChoiceViewSet(viewsets.ModelViewSet):
+    serializer_class = ChoiceResourceSerializer
+    queryset = Choice.objects.select_related("question", "question__exam").order_by("id")
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        self.get_serializer().validate_deletion(instance)
+        return super().destroy(request, *args, **kwargs)

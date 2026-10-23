@@ -10,6 +10,37 @@ class ChoiceSerializer(serializers.ModelSerializer):
         fields = ["id", "text", "is_correct"]
 
 
+class ChoiceResourceSerializer(ChoiceSerializer):
+    """Standalone choice resource; question remains a primary-key relationship."""
+    question = serializers.PrimaryKeyRelatedField(queryset=Question.objects.all())
+
+    class Meta(ChoiceSerializer.Meta):
+        fields = ["id", "question", "text", "is_correct"]
+
+    def validate(self, attrs):
+        instance = self.instance
+        question = attrs.get("question", instance.question if instance else None)
+        if instance and question.pk != instance.question_id:
+            raise serializers.ValidationError({"question": "No se puede mover una opción a otra pregunta."})
+
+        siblings = question.choices.exclude(pk=instance.pk) if instance else question.choices.all()
+        correct = attrs.get("is_correct", instance.is_correct if instance else False)
+        flags = list(siblings.values_list("is_correct", flat=True)) + [correct]
+        if len(flags) < 2:
+            raise serializers.ValidationError({"detail": "Una pregunta necesita al menos dos opciones."})
+        if sum(flags) != 1:
+            raise serializers.ValidationError({"detail": "Debe haber exactamente una opción correcta."})
+        return attrs
+
+    @staticmethod
+    def validate_deletion(instance):
+        remaining = instance.question.choices.exclude(pk=instance.pk)
+        if remaining.count() < 2:
+            raise serializers.ValidationError({"detail": "Una pregunta necesita al menos dos opciones."})
+        if remaining.filter(is_correct=True).count() != 1:
+            raise serializers.ValidationError({"detail": "Debe haber exactamente una opción correcta."})
+
+
 class ExamSerializer(serializers.ModelSerializer):
     question_count = serializers.IntegerField(read_only=True)
 

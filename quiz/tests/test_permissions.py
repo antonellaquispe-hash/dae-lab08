@@ -1,11 +1,7 @@
-"""Part 3 of the lab: the roles. The server decides, whatever the client does.
-
-`test_the_agent_cannot_delete` FAILS in the starter on purpose: `AgentPermission` lets everything
-through. Implement it in quiz/permissions.py until the whole file passes.
-"""
+"""Role tests: authorization is enforced by the server for every client."""
 from rest_framework.test import APITestCase
 
-from quiz.models import Question
+from quiz.models import Choice, Question
 
 from .helpers import exam_id, reader_token, seed, valid_body
 
@@ -39,6 +35,12 @@ class RoleTests(APITestCase):
 
     def test_the_agent_cannot_delete_an_exam_either(self):
         self.assertEqual(self.as_(self.agent).delete(f"/api/exams/{exam_id()}/").status_code, 403)
+
+    def test_the_agent_cannot_delete_a_choice(self):
+        choice = Choice.objects.first()
+        response = self.as_(self.agent).delete(f"/api/choices/{choice.id}/")
+        self.assertEqual(response.status_code, 403)
+        self.assertTrue(Choice.objects.filter(id=choice.id).exists())
 
     def test_a_person_can_delete(self):
         question = Question.objects.first()

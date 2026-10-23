@@ -1,8 +1,4 @@
-"""Part 2 of the lab: the headless client.
-
-The first two classes FAIL in the starter on purpose (the two functions marked TODO in quizctl.py).
-The live class talks to a real server started by the test, exactly as a user would from the console.
-"""
+"""The client status handling and requests against an actual local HTTP server."""
 import io
 import json
 

@@ -17,7 +17,7 @@ Exit codes:
     0 ok   1 other / usage   2 validation (400)   3 not allowed (401, 403)
     4 not found (404)   5 server error (5xx)   6 no connection
 
-The two functions marked TODO(team) are yours (part 2 of the lab).
+The command-line client keeps its HTTP status handling and request payloads in one place.
 """
 import argparse
 import json
@@ -39,15 +39,22 @@ class Result:
     error: str = ""
 
 
-# --- TODO(team): the two functions of part 2 ------------------------------------------------
-
-
 def exit_code_for(status: int) -> int:
     """Map an HTTP status to the exit code of the table above.
 
     2xx -> 0 · 400 -> 2 · 401 and 403 -> 3 · 404 -> 4 · 5xx -> 5 · any other status -> 1.
     """
-    raise NotImplementedError("TODO(team): map the HTTP status to an exit code")
+    if 200 <= status < 300:
+        return EXIT_OK
+    if status == 400:
+        return EXIT_VALIDATION
+    if status in (401, 403):
+        return EXIT_FORBIDDEN
+    if status == 404:
+        return EXIT_NOT_FOUND
+    if 500 <= status < 600:
+        return EXIT_SERVER
+    return EXIT_OTHER
 
 
 def build_question_payload(exam_id: int, text: str, choices: list[str]) -> dict:
@@ -61,7 +68,14 @@ def build_question_payload(exam_id: int, text: str, choices: list[str]) -> dict:
     Do NOT validate here (how many choices, how many correct): that is the server's job,
     and the server answers 400 with the reason.
     """
-    raise NotImplementedError("TODO(team): build the body from the --choice options")
+    serialized_choices = []
+    for choice in choices:
+        is_correct = choice.endswith(":ok")
+        serialized_choices.append({
+            "text": choice[:-3] if is_correct else choice,
+            "is_correct": is_correct,
+        })
+    return {"exam": exam_id, "text": text, "choices": serialized_choices}
 
 
 # --- the rest of the client (already written) -------------------------------------------------
