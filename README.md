@@ -117,4 +117,3 @@ pasan desde el principio.
 ## Convenciones del curso
 
 Código, nombres y comentarios en inglés; explicaciones y entregables en español. PEP 8.
-
