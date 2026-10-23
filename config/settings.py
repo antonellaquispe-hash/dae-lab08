@@ -13,6 +13,7 @@ ALLOWED_HOSTS = ["localhost", "127.0.0.1", "testserver"]
 INSTALLED_APPS = [
     "django.contrib.auth",
     "django.contrib.contenttypes",
+    "django.contrib.staticfiles",
     "rest_framework",
     "rest_framework.authtoken",
     "drf_spectacular",
@@ -22,6 +23,17 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.middleware.common.CommonMiddleware",
+]
+
+TEMPLATES = [
+    {
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": [],
+        "APP_DIRS": True,
+        "OPTIONS": {
+            "context_processors": ["django.template.context_processors.request"],
+        },
+    },
 ]
 
 ROOT_URLCONF = "config.urls"
@@ -39,7 +51,7 @@ TIME_ZONE = "America/Lima"
 USE_I18N = True
 USE_TZ = True
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-STATIC_URL = "static/"  # without it, the test server (LiveServerTestCase) answers 500 to every request
+STATIC_URL = "/static/"
 
 REST_FRAMEWORK = {
     # Identity comes from a token in the Authorization header: no cookies, no sessions.
@@ -60,3 +72,4 @@ SPECTACULAR_SETTINGS = {
     "VERSION": "1.0.0",
     "SERVE_INCLUDE_SCHEMA": False,
 }
+
