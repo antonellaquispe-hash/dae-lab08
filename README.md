@@ -10,6 +10,8 @@ Este proyecto expone exámenes, preguntas y opciones como recursos HTTP. Los ser
 - Permite listar, consultar, crear, reemplazar, modificar parcialmente y eliminar recursos por HTTP.
 - Filtra preguntas por examen, busca por texto y pagina las listas en grupos de cinco.
 - Publica el esquema OpenAPI y una interfaz navegable.
+- Habilita CORS para la aplicación React local en `http://localhost:5173`.
+- Incluye un cliente React con Axios para listar, crear y eliminar exámenes, y muestra carga, datos y errores.
 
 ## Requisitos y puesta en marcha
 
@@ -34,6 +36,20 @@ $env:QUIZ_TOKEN = $env:QUIZ_TOKEN_HUMANO
 ```
 
 La API requiere `Authorization: Token <token>`. `quizctl.py` lee `QUIZ_URL` y `QUIZ_TOKEN` del entorno.
+
+## Cliente React
+
+En una terminal deja Django ejecutándose en `http://127.0.0.1:8000`. En otra:
+
+```powershell
+cd frontend
+npm install
+npm run dev
+```
+
+Abre `http://localhost:5173`, pega el token de `profe` generado por `seed_quiz` y pulsa **Guardar token**. La aplicación lista exámenes, permite crear uno y eliminarlo. El cliente muestra el estado de carga, los datos o el error; si la API no está disponible, se puede reintentar. Axios usa una sola dirección base (`VITE_API_BASE_URL`, por defecto `http://127.0.0.1:8000/api/`) y traduce los errores HTTP y de conexión.
+
+El backend permite el origen exacto `http://localhost:5173`, que corresponde al servidor de desarrollo Vite. `http://127.0.0.1:5173`, otro puerto o un esquema distinto son orígenes diferentes. La política no usa comodines ni credenciales de cookies: la autenticación viaja en el encabezado `Authorization`.
 
 ## Recursos y contrato HTTP
 
@@ -94,3 +110,4 @@ Las pruebas recorren las operaciones de los tres recursos, las respuestas de val
 ```powershell
 python manage.py test
 ```
+
