@@ -10,7 +10,6 @@ export function ExamManager() {
   async function handleCreate(event) {
     event.preventDefault();
     const trimmedTitle = title.trim();
-    if (!trimmedTitle) return;
     const created = await create(trimmedTitle);
     if (created) setTitle("");
   }
@@ -66,7 +65,7 @@ export function ExamManager() {
           <div className="create-copy"><strong>Un nuevo reto comienza aquí</strong><span>Crea un examen para agregarlo a tu biblioteca.</span></div>
           <label className="sr-only" htmlFor="exam-title">Título del examen</label>
           <input id="exam-title" value={title} onChange={(event) => setTitle(event.target.value)} placeholder="Ej. Fundamentos de Django" maxLength={120} />
-          <button className="button button-primary" type="submit" disabled={pendingAction || !title.trim()}>{pendingAction ? "Guardando…" : "Crear examen"}<span aria-hidden="true">↗</span></button>
+          <button className="button button-primary" type="submit" disabled={pendingAction}>{pendingAction ? "Guardando…" : "Crear examen"}<span aria-hidden="true">↗</span></button>
         </form>
 
         {actionError && <p className="notice notice-error" role="alert">{actionError}</p>}
@@ -86,3 +85,4 @@ export function ExamManager() {
     </main>
   );
 }
+

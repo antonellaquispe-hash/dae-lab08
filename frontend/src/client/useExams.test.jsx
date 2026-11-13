@@ -52,4 +52,17 @@ describe("ExamManager", () => {
     await waitFor(() => expect(screen.queryByRole("heading", { name: "React" })).not.toBeInTheDocument());
     expect(deleteExam).toHaveBeenCalledWith(2);
   });
+
+  it("shows the API validation message for an empty title", async () => {
+    listExams.mockResolvedValue({ results: [] });
+    createExam.mockRejectedValue(new Error("Este campo no puede estar en blanco."));
+    render(<ExamManager />);
+
+    await screen.findByText("Tu biblioteca empieza hoy");
+    await userEvent.click(screen.getByRole("button", { name: "Crear examen" }));
+
+    expect(await screen.findByRole("alert")).toHaveTextContent("Este campo no puede estar en blanco.");
+    expect(createExam).toHaveBeenCalledWith("");
+  });
 });
+
